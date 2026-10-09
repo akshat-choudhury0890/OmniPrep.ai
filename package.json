@@ -1,0 +1,21 @@
+{
+  "name": "omniprep.ai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:Backend": "npm run dev --prefix Backend",
+    "dev:Frontend": "npm run dev --prefix Frontend",
+    "dev": "concurrently \"npm run dev:Backend\" \"npm run dev:Frontend\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  },
+  "dependencies": {
+    "pdf-parse": "^2.4.5"
+  }
+}
