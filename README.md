@@ -18,7 +18,8 @@
 - 🎯 **Contextual RAG Retrieval:** Queries return exact responses grounded exclusively in your uploaded notes.
 - 🧠 **Google Gemini Powered:** Fast, accurate text embeddings and conversational LLM responses.
 - 💾 **Vector Search Database:** Integrated with **Neon PostgreSQL** for efficient vector similarity lookup.
-- 👾 **Retro Cyber UI:** Retro/vaporwave synth aesthetic built with modern React.
+- 👾 **Pixelated Lo-fi UI:** Pixelated/lo-fi aesthetic built with modern React.
+- 🎼 **Music Feature:** Plays relaxing lo-fi beats meant to create a relaxing environment.
 
 ---
 
@@ -26,7 +27,7 @@
 
 ### **Frontend**
 - **Framework:** React + Vite
-- **Styling:** CSS Modules / Custom Retro Cyberpunk Styling
+- **Styling:** CSS Modules / Custom Pixelated lo-fi Styling
 - **Deployment:** Vercel
 
 ### **Backend**
