@@ -53,8 +53,8 @@
                          │  Neon PostgreSQL   │      │ Google Gemini API  │
                          │   (Vector Search)  │      │(Embeddings & Chat) │
                          └────────────────────┘      └────────────────────┘
+```
 
-**Website Dashboard: **
-
+**Website Dashboard:**
 <img width="1876" height="979" alt="Screenshot_20261010_023145" src="https://github.com/user-attachments/assets/cf2c8336-0f65-4db5-a93d-fb2374a8d589" />
 
