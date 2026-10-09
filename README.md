@@ -54,4 +54,7 @@
                          │   (Vector Search)  │      │(Embeddings & Chat) │
                          └────────────────────┘      └────────────────────┘
 
-<img width="1876" height="979" alt="image" src="https://github.com/user-attachments/assets/7444cd7b-b333-4785-9584-d59e7d2cc8cb" />
+**Website Dashboard: **
+
+<img width="1876" height="979" alt="Screenshot_20261010_023145" src="https://github.com/user-attachments/assets/cf2c8336-0f65-4db5-a93d-fb2374a8d589" />
+
