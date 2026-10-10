@@ -7,7 +7,7 @@
 
 ## 🚀 Live Demo
 
-- **Frontend Application:** 
+- **Frontend Application:** `https://omni-prep-8ji6j6pk5-akshat-c.vercel.app/`
 - **Backend API:** `https://omniprep-ai-backend.onrender.com`
 
 ---
