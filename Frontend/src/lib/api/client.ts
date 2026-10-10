@@ -81,6 +81,61 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return parse<T>(res);
 }
 
+/**
+ * The backend currently answers /api/chat in snake_case
+ * ({ response, citations, study_resources, ... }) while the frontend contract
+ * expects camelCase ({ answer, sources, resources, ... }).
+ * This adapter converts the former into the latter, and passes a
+ * contract-shaped response through untouched, so it keeps working
+ * once the backend is fixed.
+ */
+interface RawCitation {
+  chunk_id?: string;
+  document_id?: string;
+  document_name?: string;
+  page_number?: number | null;
+  chunk_index?: number;
+  chunk_text?: string;
+  similarity_score?: number;
+}
+
+interface RawChatResponse {
+  // snake_case shape (current backend)
+  response?: string;
+  citations?: RawCitation[];
+  study_resources?: unknown[];
+  study_resources_status?: string;
+  grounding_status?: string;
+  model_used?: string;
+  // contract shape (future backend)
+  answer?: string;
+}
+
+function normalizeChat(raw: RawChatResponse | null): ChatResponse {
+  if (raw && typeof raw.answer === "string") return raw as unknown as ChatResponse;
+
+  const citations = raw?.citations ?? [];
+  const adapted = {
+    answer: raw?.response ?? "",
+    grounded: raw?.grounding_status === "supported",
+    insufficientContext: citations.length === 0,
+    sources: citations.map((c) => ({
+      id: c.chunk_id ?? "",
+      documentId: c.document_id ?? "",
+      filename: c.document_name ?? "Unknown document",
+      pageNumber: c.page_number ?? null,
+      chunkIndex: c.chunk_index ?? 0,
+      snippet: c.chunk_text ?? "",
+      score: c.similarity_score ?? 0,
+    })),
+    resources: raw?.study_resources ?? [],
+    resourcesError:
+      raw?.study_resources_status === "error" ? "Study links are unavailable right now." : null,
+    model: raw?.model_used ?? "",
+  };
+  return adapted as unknown as ChatResponse;
+}
+
 export const api = {
   listDocuments: () => request<ListDocumentsResponse>("/api/documents"),
 
@@ -89,13 +144,15 @@ export const api = {
       method: "DELETE",
     }),
 
-  chat: (body: ChatRequest, signal?: AbortSignal) =>
-    request<ChatResponse>("/api/chat", {
+  chat: async (body: ChatRequest, signal?: AbortSignal): Promise<ChatResponse> => {
+    const raw = await request<RawChatResponse | null>("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
       signal: signal ?? null,
-    }),
+    });
+    return normalizeChat(raw);
+  },
 
   /** Multipart upload with real progress via XHR (fetch has no upload progress). */
   uploadDocuments: (files: File[], onProgress?: (pct: number) => void) =>
