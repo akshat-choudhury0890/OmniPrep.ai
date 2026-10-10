@@ -11,6 +11,25 @@ const RAW_BASE = (import.meta.env["VITE_API_BASE_URL"] as string | undefined) ??
 export const API_BASE_URL = RAW_BASE.replace(/\/+$/, "");
 export const isApiConfigured = API_BASE_URL.length > 0;
 
+const SESSION_KEY = "omniprep_session";
+const SESSION_HEADER = "X-OmniPrep-Session";
+
+const getToken = (): string | null => {
+  try {
+    return localStorage.getItem(SESSION_KEY);
+  } catch {
+    return null;
+  }
+};
+const saveToken = (t: string | null) => {
+  if (!t) return;
+  try {
+    localStorage.setItem(SESSION_KEY, t);
+  } catch {
+    /* storage blocked */
+  }
+};
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -48,12 +67,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       0,
     );
   }
+  const headers = new Headers(init?.headers);
+  const token = getToken();
+  if (token) headers.set(SESSION_HEADER, token);
+
   let res: Response;
   try {
-    res = await fetch(`${API_BASE_URL}${path}`, { credentials: "include", ...init });
+    res = await fetch(`${API_BASE_URL}${path}`, { credentials: "include", ...init, headers });
   } catch {
     throw new ApiError("Can't reach the OmniPrep server. Check your connection.", "NETWORK", 0);
   }
+  saveToken(res.headers.get(SESSION_HEADER));
   return parse<T>(res);
 }
 
@@ -85,11 +109,14 @@ export const api = {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", `${API_BASE_URL}/api/documents/upload`);
       xhr.withCredentials = true;
+      const token = getToken();
+      if (token) xhr.setRequestHeader(SESSION_HEADER, token);
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
       };
       xhr.onerror = () => reject(new ApiError("Upload failed: server unreachable.", "NETWORK", 0));
       xhr.onload = () => {
+        saveToken(xhr.getResponseHeader(SESSION_HEADER));
         parse<UploadDocumentsResponse>(
           new Response(xhr.responseText || null, { status: xhr.status }),
         ).then(resolve, reject);
